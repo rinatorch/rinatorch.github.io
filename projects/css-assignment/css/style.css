@@ -1,10 +1,86 @@
-h1{
-	font-family:'Playfair Display', serif;
+@font-face {
+	font-family: 'Newsreader';
+
 }
+
+body {
+    background-color: #f0f0f0;
+    padding-left: 600px;
+    padding-right: 600px;
+}
+
+h1 {
+    font-family: 'Newsreader', sans-serif;
+    text-align: center;
+}
+
+h2 {
+    font-family: 'Playfair Display', sans-serif;
+}
+
+.date {
+    font-family: 'Lato', sans-serif;
+    font-weight: normal;
+    color: gray;
+    font-style: italic;
+    padding-left: 41px;
+}
+
+.section,
+.credit,
+figcaption {
+    font-family: 'Lato', sans-serif;
+    color: gray;
+    padding-left: 41px;
+}
+
+figcaption {
+    font-family: 'Lato', sans-serif;
+    color: gray;
+    padding-left: 0px;
+    font-family: 'Georgia', sans-serif;
+}
+
+p {
+    font-family: 'Lato', sans-serif;
+}
+
 
 .byline,
-.credit,
-.dateline{
-	font-family: 'Lato', sans-serif;
+.dateline {
+    font-family: 'Lato', sans-serif;
+    font-weight: bold;
+    text-decoration: none;
+    color: gray;
+    padding-left: 41px;
 }
 
+.dogfeature {
+    padding-right: 20px;
+    padding-bottom: 10px;
+
+}
+
+.link2more {
+    font-family: 'Lato', sans-serif;
+    font-weight: bold;
+    text-decoration: none;
+    color: black;
+    font-style: italic;
+
+}
+
+.byline:hover {
+    color: black;
+}
+
+.link2more:hover {
+    color: gray;
+}
+
+.biobox {
+    background: #ced2d9;
+    font-family: 'Georgia', sans-serif;
+    padding: 15px;
+
+}
