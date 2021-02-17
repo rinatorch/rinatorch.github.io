@@ -1,61 +1,88 @@
-@font-face {
-	font-family: 'Newsreader';
-
-}
-
 body {
-    background-color: #f0f0f0;
-    padding-left: 600px;
+    padding-left: 590px;
     padding-right: 600px;
+    background-color: #f0f0f0;
 }
 
 h1 {
-    font-family: 'Newsreader', sans-serif;
-    text-align: center;
-}
+    font-family: 'Arial', sans-serif;
+   }
 
 h2 {
-    font-family: 'Playfair Display', sans-serif;
+    font-family: 'Arial', sans-serif;
+
 }
+
 
 .date {
     font-family: 'Lato', sans-serif;
     font-weight: normal;
     color: gray;
     font-style: italic;
-    padding-left: 41px;
+ 
 }
 
 .section,
-.credit,
-figcaption {
-    font-family: 'Lato', sans-serif;
+.credit {
+    font-family: 'Georgia', sans-serif;
     color: gray;
-    padding-left: 41px;
+   
+}
+
+figure{
+margin-left: auto;
 }
 
 figcaption {
-    font-family: 'Lato', sans-serif;
-    color: gray;
-    padding-left: 0px;
     font-family: 'Georgia', sans-serif;
-}
+    color: gray;
+
+   }
+
 
 p {
     font-family: 'Lato', sans-serif;
 }
 
+.byline {
+    text-decoration: none;
+    font-weight: bold;
+    color: gray;
+    
 
-h1{
-	font-family:'Playfair Display', serif;
 }
 
-h1{
-	font-family:'Playfair Display', serif;
+.byline:hover {
+    color: black;
+
 }
 
+.link2more {
+    color: black;
+    text-decoration: none;
+    font-weight: bold;
+    font-style: italic;
+    font-family: 'Lato', sans-serif;
+}
+
+.link2more:hover {
+    color: gray;
+}
+
+.byline,
 .credit,
-.dateline{
-	font-family: 'Lato', sans-serif;
+.dateline {
+    font-family: 'Lato', sans-serif;
 }
 
+.dogfeature {
+    padding-right: 20px;
+    padding-bottom: 20px;
+    
+}
+
+.biobox {
+    background-color: #bab8b8;
+    padding: 15px;
+
+}
