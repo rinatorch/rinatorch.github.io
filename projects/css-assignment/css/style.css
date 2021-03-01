@@ -32,7 +32,7 @@ h2 {
 figure {
     padding-left: 0%;
     padding-right: 0%;
-    float:left;
+    float: left;
 
 
 }
@@ -93,16 +93,16 @@ p {
 }
 
 .dog {
-	width:32%; 
-	height:200px;
+    width: 32%;
+    height: 200px;
 }
 
 .mainpic {
-	display: block;
-  	margin-left: auto;
-  	object-fit: cover;
-  	width: 100%;
-  	height: 100%;
+    display: block;
+    margin-left: auto;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
 
-  	 	
+
 }
