@@ -1,0 +1,68 @@
+.hed {
+	color:black;
+	padding-top: 10%;
+	font-size: larger;
+	padding-left: 2%
+}
+
+h1 {
+	font-family: 'Oswald',sans-serif;
+}
+
+h2 {
+
+	font-family: 'Oswald Extra-light 200',sans-serif;
+	font-size: larger;
+	text-decoration: none;
+	}
+
+
+.nav {
+	color:black;
+	padding-top: 0.4%;
+	font-size: larger;
+	padding-left: 2%
+}
+
+
+
+#bodytext{
+	float:left;
+	padding-left: 2%;
+	
+}
+
+body{
+	padding-right:25%;
+	padding-left:2%;
+}
+
+a:hover {
+    color: red;
+    
+}
+
+a {
+text-decoration: none;
+color: black;
+
+}
+
+.storylinks, .datamain{
+	padding-top:0.4%;
+	padding-left: 2%;
+}
+
+.resume {
+	padding-left:2%;
+	padding-top: 1%;
+}
+
+h3 {
+	font-family: 'Oswald',sans-serif;
+}
+
+h4 {
+	font-family: 'Oswald Extra-light 200',sans-serif;}
+
+/* Create two equal columns that sits next to each other ^ */
