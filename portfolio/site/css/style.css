@@ -1,0 +1,80 @@
+/*padding top 10%
+/* padding left 2%
+/* body padding right
+
+*/
+
+/*full site*/
+body {
+    margin-top: 10%;
+    margin-bottom: 10%;
+    padding-left: 2%;
+    font-family: 'Roboto', sans-serif;
+
+}
+
+a:hover {
+    color: red;
+
+}
+
+a {
+    text-decoration: none;
+    color: black;
+
+}
+
+
+/*NAV*/
+
+.hed {
+    color: black;
+    font-size: larger;
+    font-family: 'Oswald', sans-serif;
+
+}
+
+.hed a {
+
+    font-family: 'Oswald Extra-light 200', sans-serif;
+    font-size: larger;
+
+}
+
+hr {
+    width: 30%;
+}
+
+
+/*NAV AND TEXT*/
+
+.hed, {
+    font-family: 'Oswald', sans-serif;
+}
+
+.nav, {
+
+	font-family: 'Roboto', sans-serif;
+}
+
+
+
+
+h3 {
+    font-family: 'Oswald', sans-serif;
+}
+
+
+
+/*WORDS*/
+
+li {
+    list-style-type: square;
+}
+
+.storylinks li {
+    line-height: 2;
+}
+
+/*Connect*/
+
