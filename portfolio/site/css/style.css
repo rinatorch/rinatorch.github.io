@@ -28,7 +28,6 @@ a {
 /*NAV*/
 
 .hed {
-    color: black;
     font-size: larger;
     font-family: 'Oswald', sans-serif;
 
@@ -48,7 +47,7 @@ hr {
 
 /*NAV AND TEXT*/
 
-.hed, {
+.hed, h3 {
     font-family: 'Oswald', sans-serif;
 }
 
@@ -58,11 +57,6 @@ hr {
 }
 
 
-
-
-h3 {
-    font-family: 'Oswald', sans-serif;
-}
 
 
 
