@@ -35,7 +35,7 @@ a {
 
 .hed a {
 
-    font-family: 'Oswald Extra-light 200', sans-serif;
+    font-family: 'Oswald', sans-serif;
     font-size: larger;
 
 }
@@ -51,7 +51,7 @@ hr {
     font-family: 'Oswald', sans-serif;
 }
 
-.nav, {
+.nav {
 
 	font-family: 'Roboto', sans-serif;
 }
