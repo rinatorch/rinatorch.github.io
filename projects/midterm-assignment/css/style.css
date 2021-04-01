@@ -1,0 +1,217 @@
+
+
+/*all*/
+.all {
+	padding-left: 3%;
+	padding-right: 3%;
+	background-color: #fc5f1a;
+	overflow: hidden;
+}
+
+a {
+	font-weight: 600;
+	color:black;
+	text-decoration: underline;
+	text-decoration-color: #ffa500;
+
+}
+
+/*fonts*/
+.titlebox h3, .name, .hyphens h2, .hed, .l1 {
+	font-family: 'Anton', sans-serif;
+
+}
+
+.story, .credits, .bio {
+	font-family: 'Nunito Sans', sans-serif;
+
+}
+
+.story {
+	font-size: 18px;
+	
+
+}
+
+.hed, .hyphens h2, .titlebox, .name {
+	text-transform:uppercase;
+
+}
+
+/*top*/
+
+.hed {
+	/* 5% below navbar*/
+	padding-top: 5%;
+	text-align: center;
+	padding-bottom: 3%;
+/* made navy, not sure it it's supposed to be black */
+	color:#010833;
+	
+	
+	
+}
+.l1 {
+	font-size: 60px;
+	
+	}
+
+
+.l2 {
+	font-size: 120px;
+	}
+
+
+
+.l3 {
+	font-size: 60px;
+	/* 3% below between hed and bio*/
+	}
+
+@media screen and (max-width: 576px) {
+  .l1, .l3 {
+    font-size: 30px;
+  }
+}
+
+
+@media screen and (max-width: 576px) {
+  .l2 {
+    font-size: 75px;
+  }
+}	
+
+/* have been struggling to figure out whether it should be italicized */
+.bio {
+	/*check this*/
+	line-height: 1;
+	font-size: 18px;
+	text-align: center;
+	/*padding between body and bio*/
+	padding-bottom: 5%;
+	font-weight: 500;
+	/* have been struggling to figure out whether it should be italicized, so added small skew */
+	transform: skew(-3deg);
+	}
+
+/* end top*/	
+
+/*graphic 1*/
+.graphic1 {
+	padding-top: 2%;
+	padding-bottom: 2%;
+	display: block;
+	margin: 0 auto 0 auto;
+}
+
+
+.img-fluid {
+	width: 100%;
+}
+
+/* start hypens section*/
+.hyphens {
+	background-color: white;
+	padding-bottom: 5%;
+	padding-top: 5%;
+	margin-top:2%;
+}
+
+
+@media screen and (max-width: 768px) {
+  .hyphens {
+    padding-left: 2%;
+    padding-right: 2%;
+  }
+}
+
+
+.hyphens h2 {
+	text-align: center;
+	color: #010833;
+}
+/*end hyphens section*/
+
+/*title box*/
+.titlebox {
+	background-color:  #010833;
+	color: #ffa500;
+	padding-bottom: 2%;
+	padding-top: 2%;
+	/* opted to exclude */
+	/*margin-top:2%;*/
+	/*margin-bottom: 2%;*/
+	
+}
+
+
+
+.titlebox h3 {
+	font-size:70px;
+	letter-spacing: 2.5px;
+	text-align: center;
+
+}
+
+
+.profile{
+	background-color: white;
+	padding-bottom: 2%;
+	padding-top: 2%;
+	padding-left: 2%;
+	padding-right: 2%;
+}
+
+.league {
+	font-weight: 500;
+	letter-spacing: 1.5px;
+	font-size: 18px;
+	color: #ffa500;
+}
+
+.name {
+	font-size: 30px;
+	margin: 0;
+	padding: 0;
+	color:  #010833;
+
+	
+}
+
+.tag {
+	font-weight: 200;
+	font-size: 16px;
+	color: #010833;
+
+}
+/*end title box*/
+
+
+
+@media screen and (max-width: 576px) {
+  .story {
+    font-size: 15px;
+    line-height: 1.75;
+  }
+}
+
+
+.lastsection {
+	padding-top: 2%;
+	padding-bottom: 1%;
+}
+
+hr.lastline {
+	border-top:2px white solid;
+	width: 25%;
+	margin: 0 auto;
+}
+
+.credits {
+	font-size: 14px;
+	padding-top: 1%;
+	padding-bottom: 5%;
+}
+
+
+
