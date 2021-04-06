@@ -13,6 +13,11 @@ body {
 
 }
 
+.resume {
+    margin-left: 1%;
+
+
+}
 a:hover {
     color: red;
 
@@ -42,7 +47,7 @@ a {
 
 hr {
     width: 30%;
-}
+    }
 
 
 /*NAV AND TEXT*/
