@@ -33,7 +33,7 @@ a {
 /*NAV*/
 
 .hed {
-    font-size: larger;
+    font-size: x-large;
     font-family: 'Oswald', sans-serif;
 
 }
@@ -69,6 +69,7 @@ hr {
 
 li {
     list-style-type: square;
+    font-family: 'Roboto', sans-serif;
 }
 
 .storylinks li {
@@ -85,5 +86,6 @@ h4, h2 {
 }
 
 h2 {
+    
 
 }
