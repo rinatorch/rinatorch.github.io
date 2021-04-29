@@ -53,3 +53,30 @@ color: #27D6CA;
 	width: 100%;
 	height: 530px;
 }
+
+@media screen and (max-width: 576px) {
+  .l1 {
+    font-size: 70px;
+  }
+}
+
+
+@media screen and (max-width: 576px) {
+  .l2 {
+    font-size: 20px;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .l2 {
+    font-size: 20px;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .all {
+    padding-left: 3%;
+    padding-right: 3%;
+  }
+}
+
