@@ -59,18 +59,21 @@ a {
 /*media queries*/
 
 
+
 @media screen and (max-width: 576px) {
   .l1 {
     font-size: 70px;
     }
 
-  .l2 {
+  h2 {
     font-size: 20px;
   }
  .all {
     padding-left: 3%;
     padding-right: 3%;
   }
+
+
 }
 
 
