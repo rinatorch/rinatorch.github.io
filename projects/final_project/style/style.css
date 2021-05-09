@@ -1,12 +1,13 @@
 
-.hed {
-	font-family: 'Roboto', sans-serif;
-	text-align: center;
+.hed, .chunk {
 	background-color: #f5f5f5;
 	padding-bottom: 2%;
-
 }
 
+.hed, .bio {
+	text-align: center;
+	font-family: 'Roboto', sans-serif;
+}
 .l1 {
 	
 	font-size: 175px;
@@ -17,7 +18,7 @@
 }
 
 
-.l2 {
+h1 {
 	font-size: 24px;
 	font-weight:500;
 
@@ -25,13 +26,12 @@
 }
 
 .bio {
-	text-align: center;
-	font-family: 'Roboto', sans-serif;
+	
 	font-weight: bold;
 
 }
 
-.greentext {
+.greentext, a:hover {
 color: #27D6CA;
 
 }
@@ -44,11 +44,19 @@ color: #27D6CA;
 }
 
 .chunk {
-	background-color: #f5f5f5;
 	padding-top: 2%;
-	padding-bottom: 2%;
 }
 
+/*links*/
+
+a {
+	text-decoration-color: #27D6CA ;
+	color: black;
+}
+
+
+
+/*media queries*/
 
 
 @media screen and (max-width: 576px) {
