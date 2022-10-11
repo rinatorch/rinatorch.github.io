@@ -157,13 +157,14 @@ cfb_mod</code></pre>
 <pre class="r"><code>ggplot() + 
   geom_bar(
     data=cfb_mod, 
-    aes (x=reorder(TeamFull, +`avg_plays`), weight=`avg_plays`)) +
+    aes (x=reorder(TeamFull, +`avg_plays`), fill=TeamFull, weight=`avg_plays`) ) +
+    geom_bar(stat = &quot;identity&quot;) +
     coord_flip() +
   
   labs(
     title=&quot;Big Ten Average Offensive Plays&quot;, 
-    y=&quot;Offensive Plays Per Game&quot;, 
-    x=&quot;School&quot;)</code></pre>
+    y=&quot;Average Offensive Plays Per Game&quot;, 
+    x=&quot;School&quot;) </code></pre>
 <p><img src="https://rinatorch.github.io/2022/10/11/big-ten-football-average-plays/index_files/figure-html/unnamed-chunk-4-1.png" width="672" />
 #Now, let’s read in 2022 data. We can see if things have changed since 2021.</p>
 <pre class="r"><code>cfb22 &lt;- read_csv(&quot;https://dwillis.github.io/sports-data-files/footballlogs22.csv&quot;)</code></pre>
@@ -224,17 +225,18 @@ cfb_mod22</code></pre>
 ## 13 Michigan State Spartans       61.2
 ## 14 Iowa Hawkeyes                 58.3</code></pre>
 <p>#Here, we can see Indiana ranks highest in average offensive plays. Purdue is now fourth. Maryland sank to fourth to last. Indiana and Northwestern are now in spots one and two respectively, so their opponents should bear in mind the offensive power they could see when they match up against these teams.</p>
-<p>#Maryland plays Northwestern and Indiana later this month. We should expect a strong offensive showing from these teams when they match up against the Terps. The Terps should expect and plan for how they might combat this.</p>
+<p>#Maryland plays Northwestern and Indiana later this month. We should expect a strong offensive showing from these teams when they match up against the Terps. The Terps should expect and plan for how they might combat this dominant offense.</p>
 <pre class="r"><code>ggplot() + 
   geom_bar(
     data=cfb_mod22, 
-    aes (x=reorder(TeamFull, +`avg_plays`), weight=`avg_plays`)) +
+    aes (x=reorder(TeamFull, +`avg_plays`), fill=TeamFull, weight=`avg_plays`) ) +
+    geom_bar(stat = &quot;identity&quot;) +
     coord_flip() +
   
   labs(
     title=&quot;Big Ten Average Offensive Plays&quot;, 
-    y=&quot;Offensive Plays Per Game&quot;, 
-    x=&quot;School&quot;)</code></pre>
+    y=&quot;Average Offensive Plays Per Game&quot;, 
+    x=&quot;School&quot;) </code></pre>
 <p><img src="https://rinatorch.github.io/2022/10/11/big-ten-football-average-plays/index_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 
     </div>
