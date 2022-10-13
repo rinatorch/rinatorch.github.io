@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.104.3" />
+
+
+<title>Volleyball Waffle Chart - Sports Data Blog</title>
+<meta property="og:title" content="Volleyball Waffle Chart - Sports Data Blog">
+
+
+  <link href='https://rinatorch.github.io/sportsdatablog/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/sportsdatablog/css/fonts.css" media="all">
+<link rel="stylesheet" href="/sportsdatablog/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/sportsdatablog/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/sportsdatablog/about/">About</a></li>
+    
+    <li><a href="https://github.com/rinatorch">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/rstudio">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">5 min read</span>
+    
+
+    <h1 class="article-title">Volleyball Waffle Chart</h1>
+
+    
+    <span class="article-date">2022-10-13</span>
+    
+
+    <div class="article-content">
+      
+
+
+<p>#The task at hand:</p>
+<p>#To begin, I’m going to load in libraries.</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+## ✔ ggplot2 3.3.6      ✔ purrr   0.3.4 
+## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
+## ✔ tidyr   1.2.1      ✔ stringr 1.4.1 
+## ✔ readr   2.1.2      ✔ forcats 0.5.2 
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<p>Let’s read the data.</p>
+<pre class="r"><code>vb &lt;- read_csv(&#39;https://raw.githubusercontent.com/dwillis/NCAAWomensVolleyballData/main/data/ncaa_womens_volleyball_matchstats_2022.csv&#39;)</code></pre>
+<pre><code>## Rows: 6077 Columns: 36
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr   (3): team, opponent, home_away
+## dbl  (31): team_score, opponent_score, s, kills, errors, total_attacks, hit_...
+## lgl   (1): result
+## date  (1): date
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<p>Let’s filter it to Terps.</p>
+<pre class="r"><code>mdvb &lt;- vb%&gt;% filter(team == &quot;Maryland Terrapins, Terps&quot;)</code></pre>
+<p>Let’s see what we’ve got.</p>
+<pre class="r"><code>mdvb</code></pre>
+<pre><code>## # A tibble: 18 × 36
+##    date       team     oppon…¹ home_…² result team_…³ oppon…⁴     s kills errors
+##    &lt;date&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;   &lt;lgl&gt;    &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+##  1 2022-08-26 Marylan… Rhode … Home    NA           3       0     3    49     10
+##  2 2022-08-26 Marylan… Navy    Home    NA           3       0     3    33      7
+##  3 2022-08-27 Marylan… FGCU    Home    NA           1       3     4    39     15
+##  4 2022-09-02 Marylan… George… Away    NA           3       0     3    40      8
+##  5 2022-09-02 Marylan… Stony … Away    NA           3       0     3    34     10
+##  6 2022-09-03 Marylan… South … Away    NA           2       3     5    39     24
+##  7 2022-09-09 Marylan… San Di… Away    NA           3       1     4    50     17
+##  8 2022-09-09 Marylan… Sacram… Away    NA           3       1     4    45     25
+##  9 2022-09-10 Marylan… Arizon… Away    NA           2       3     5    57     27
+## 10 2022-09-16 Marylan… Mercer  Away    NA           3       1     4    46     20
+## 11 2022-09-16 Marylan… East C… Away    NA           3       0     3    50     12
+## 12 2022-09-17 Marylan… Virgin… Away    NA           3       0     3    37     16
+## 13 2022-09-23 Marylan… Illino… Away    NA           1       3     4    37     21
+## 14 2022-09-25 Marylan… Indiana Home    NA           2       3     5    50     23
+## 15 2022-09-30 Marylan… Michig… Home    NA           2       3     5    50     21
+## 16 2022-10-02 Marylan… Nebras… Home    NA           1       3     4    41     34
+## 17 2022-10-07 Marylan… Illino… Home    NA           0       3     3    29     15
+## 18 2022-10-09 Marylan… Rutgers Away    NA           3       0     3    41     12
+## # … with 26 more variables: total_attacks &lt;dbl&gt;, hit_pct &lt;dbl&gt;, assists &lt;dbl&gt;,
+## #   aces &lt;dbl&gt;, s_err &lt;dbl&gt;, digs &lt;dbl&gt;, r_err &lt;dbl&gt;, block_solos &lt;dbl&gt;,
+## #   block_assists &lt;dbl&gt;, b_err &lt;dbl&gt;, pts &lt;dbl&gt;, bhe &lt;dbl&gt;,
+## #   defensive_kills &lt;dbl&gt;, defensive_errors &lt;dbl&gt;,
+## #   defensive_total_attacks &lt;dbl&gt;, defensive_hit_pct &lt;dbl&gt;,
+## #   defensive_assists &lt;dbl&gt;, defensive_aces &lt;dbl&gt;, defensive_s_err &lt;dbl&gt;,
+## #   defensive_digs &lt;dbl&gt;, defensive_r_err &lt;dbl&gt;, defensive_block_solos &lt;dbl&gt;, …</code></pre>
+<p>I’m calculating total kills, aces and blocks.</p>
+<pre class="r"><code>mdvb_selects &lt;-
+  mdvb%&gt;% summarize(sum_kills = sum(kills),
+                    sum_aces = sum(aces), 
+                    total_blocks = sum(block_solos) + sum(round(block_assists/2))
+                        )</code></pre>
+<p>It’s waffle time! Let’s assemble the values and throw them in the waffle.</p>
+<pre class="r"><code>library(waffle)
+
+mdvals &lt;- c(&quot;kills&quot;=767, &quot;aces&quot;=133, &quot;blocks&quot;=227)
+
+
+waffle(
+        mdvals/2, 
+        rows = 10, 
+        title=&quot;Here&#39;s what&#39;s behind Maryland Volleyball&#39;s points&quot;, 
+        xlab=&quot;1 square = 1 yard&quot;, 
+        colors = c(&quot;black&quot;, &quot;red&quot;, &quot;gold&quot;)
+)</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/10/13/volleyball-waffle-chart/index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>Let’s filter it to Nebrasks</p>
+<pre class="r"><code>nvb &lt;- vb%&gt;% filter(team == &quot;Nebraska Cornhuskers&quot;)</code></pre>
+<p>Let’s see what we’ve got.</p>
+<pre class="r"><code>nvb</code></pre>
+<pre><code>## # A tibble: 15 × 36
+##    date       team     oppon…¹ home_…² result team_…³ oppon…⁴     s kills errors
+##    &lt;date&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;   &lt;lgl&gt;    &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+##  1 2022-08-26 Nebrask… A&amp;M-Co… Home    NA           3       0     3    38      7
+##  2 2022-08-26 Nebrask… Tulsa   Home    NA           3       0     3    47     12
+##  3 2022-08-27 Nebrask… Pepper… Home    NA           3       0     3    38     24
+##  4 2022-09-01 Nebrask… LMU (C… Home    NA           3       0     3    44     11
+##  5 2022-09-03 Nebrask… Ole Mi… Home    NA           3       0     3    40      9
+##  6 2022-09-07 Nebrask… Creigh… Away    NA           3       2     5    78     27
+##  7 2022-09-10 Nebrask… Long B… Home    NA           3       0     3    44     16
+##  8 2022-09-13 Nebrask… Stanfo… Home    NA           1       3     4    50     24
+##  9 2022-09-18 Nebrask… Kentuc… Away    NA           3       0     3    44      9
+## 10 2022-09-23 Nebrask… Michig… Home    NA           3       0     3    43     19
+## 11 2022-09-24 Nebrask… Ohio S… Home    NA           3       2     5    46     22
+## 12 2022-09-30 Nebrask… Rutgers Away    NA           3       0     3    42      8
+## 13 2022-10-02 Nebrask… Maryla… Away    NA           3       1     4    44     29
+## 14 2022-10-06 Nebrask… Michig… Away    NA           3       0     3    40     11
+## 15 2022-10-08 Nebrask… Michig… Away    NA           3       0     3    45      8
+## # … with 26 more variables: total_attacks &lt;dbl&gt;, hit_pct &lt;dbl&gt;, assists &lt;dbl&gt;,
+## #   aces &lt;dbl&gt;, s_err &lt;dbl&gt;, digs &lt;dbl&gt;, r_err &lt;dbl&gt;, block_solos &lt;dbl&gt;,
+## #   block_assists &lt;dbl&gt;, b_err &lt;dbl&gt;, pts &lt;dbl&gt;, bhe &lt;dbl&gt;,
+## #   defensive_kills &lt;dbl&gt;, defensive_errors &lt;dbl&gt;,
+## #   defensive_total_attacks &lt;dbl&gt;, defensive_hit_pct &lt;dbl&gt;,
+## #   defensive_assists &lt;dbl&gt;, defensive_aces &lt;dbl&gt;, defensive_s_err &lt;dbl&gt;,
+## #   defensive_digs &lt;dbl&gt;, defensive_r_err &lt;dbl&gt;, defensive_block_solos &lt;dbl&gt;, …</code></pre>
+<p>Let’s calculate sums for kills, blocks and aces,</p>
+<pre class="r"><code>nvb_selects &lt;-
+  nvb%&gt;% summarize(sum_kills = sum(kills),
+                    sum_aces = sum(aces), 
+                    total_blocks = sum(block_solos) + sum(round(block_assists/2))
+                        )</code></pre>
+<p>Let’s assemble the values together and waffle ’em.</p>
+<pre class="r"><code>nvbvals &lt;- c(&quot;kills&quot;=683, &quot;aces&quot;=64, &quot;blocks&quot;=139, 241)
+
+
+waffle(
+        nvbvals/2, 
+        rows = 10, 
+        title=&quot;Here&#39;s what&#39;s behind Nebraska Volleyball&#39;s points&quot;, 
+        xlab=&quot;1 square = 1 yard&quot;, 
+        colors = c(&quot;black&quot;, &quot;red&quot;, &quot;gold&quot;, &quot;white&quot;)
+)</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/10/13/volleyball-waffle-chart/index_files/figure-html/unnamed-chunk-10-1.png" width="672" />
+Let’s throw them together and compare.</p>
+<pre class="r"><code>iron(
+  
+waffle(
+        mdvals/2, 
+        rows = 15, 
+        title=&quot;Here&#39;s what&#39;s behind Maryland Volleyball&#39;s points&quot;, 
+        xlab=&quot;1 square = 1 yard&quot;, 
+        colors = c(&quot;black&quot;, &quot;red&quot;, &quot;gold&quot;)
+),
+ 
+waffle(
+        nvbvals/2, 
+        rows = 15, 
+        title=&quot;Here&#39;s what&#39;s behind Nebraska Volleyball&#39;s points&quot;, 
+        xlab=&quot;1 square = 1 yard&quot;, 
+        colors = c(&quot;black&quot;, &quot;red&quot;, &quot;gold&quot;, &quot;white&quot;)
+)
+)</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/10/13/volleyball-waffle-chart/index_files/figure-html/unnamed-chunk-11-1.png" width="672" />
+A takeaway: Maryland relies on blocks to earn points more so than the Nebraska does. Nebraska, which is top of the Big Ten and has a 6-0 record, uses kills to dominate the scoreboard, but Maryland makes use of aces, too. While both teams stress kills, the Terps make use of other points-earnings tactics, too. Maryland has also scored far more points than Nebraska. Maryland might be playing more sets, but Nebraska is able to knock out the opponent rather than accruing more points in additional sets.</p>
+<p>Down the line, it would be interesting to calculate averages of kills, aces and blocks per game per team.</p>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/sportsdatablog/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/sportsdatablog/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+
+    
+  </body>
+</html>
+
