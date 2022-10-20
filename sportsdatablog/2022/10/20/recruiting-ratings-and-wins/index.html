@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.104.3" />
+
+
+<title>Recruiting Ratings and Wins - Sports Data Blog</title>
+<meta property="og:title" content="Recruiting Ratings and Wins - Sports Data Blog">
+
+
+  <link href='https://rinatorch.github.io/sportsdatablog/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/sportsdatablog/css/fonts.css" media="all">
+<link rel="stylesheet" href="/sportsdatablog/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/sportsdatablog/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/sportsdatablog/about/">About</a></li>
+    
+    <li><a href="https://github.com/rinatorch">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/rstudio">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">3 min read</span>
+    
+
+    <h1 class="article-title">Recruiting Ratings and Wins</h1>
+
+    
+    <span class="article-date">2022-10-20</span>
+    
+
+    <div class="article-content">
+      
+
+
+<p>Let’s take a look at the relationship between ratings and recruiting in college football. I want to find out whether a team with a good recruiting class will translate to a lot of wins.</p>
+<p>Let’s start by loading the libraries.</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+## ✔ ggplot2 3.3.6      ✔ purrr   0.3.4 
+## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
+## ✔ tidyr   1.2.1      ✔ stringr 1.4.1 
+## ✔ readr   2.1.2      ✔ forcats 0.5.2 
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(dplyr) </code></pre>
+<p>Now I’ll load in datasets for college football recruitment ratings and team records.</p>
+<pre class="r"><code>recruit &lt;- read.csv(&quot;all_rankings.csv&quot;)
+records &lt;- read.csv(&quot;all_teams.csv&quot;)</code></pre>
+<p>Let’s join these two datasets together on common columns: team and year.</p>
+<pre class="r"><code>joined &lt;- inner_join(recruit, records, by = &quot;team&quot;, &quot;year&quot;)                </code></pre>
+<p>Next, I’ll make a scatterplot to examine the relationship. I’m also adding data from the just Terps so we can see how they stack up.</p>
+<pre class="r"><code>terps &lt;- joined %&gt;% filter(team == &quot;Maryland&quot;)
+
+ggplot() + 
+  geom_point(data=joined, aes(x=total_wins, y=rating)) +
+  geom_smooth(data=joined, aes(x=total_wins, y=rating), method=&quot;lm&quot;) +
+  geom_point(data=terps, aes(x=total_wins, y=rating), color = &quot;red&quot;)</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/10/20/recruiting-ratings-and-wins/index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Let’s build a linear model to analyze.</p>
+<pre class="r"><code>fit &lt;- lm(rating ~ total_wins, data = joined)
+summary(fit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = rating ~ total_wins, data = joined)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -69.571 -26.282  -5.616  23.837 104.893 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 196.4247     1.7008  115.49   &lt;2e-16 ***
+## total_wins    4.5447     0.2116   21.48   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 34.27 on 2798 degrees of freedom
+## Multiple R-squared:  0.1416, Adjusted R-squared:  0.1413 
+## F-statistic: 461.5 on 1 and 2798 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Here’s what we’ve got. The adjusted R-squared value is 0.1413, which tells us that ratings play a small role in predicting whether a team will win a lot. The p-value is less that .05, which is a good sign. This low p-value tells us that there is a statistically significant relationship between rating and wins.</p>
+<p>Now that we know that a good recruiting rating can play a role - albeit a small one - in a team’s wins, it would be interesting to take a closer look at the the top recruiting teams, and then locate a team that’s starting out with a great recruiting class but not producing the wins you might expect. It would also be interesting to look into how much these teams are spending, and it could be quite a story if a team is spending a ton of money on recruitment, it pays off and they can get a great recruiting class, however, they’re still not winning games.</p>
+<p>I’m curious about when the relationship is stronger, and when the relationship is weaker. What are the other variables that might influence this relationship between recruitment rating and wins?</p>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/sportsdatablog/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/sportsdatablog/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+
+    
+  </body>
+</html>
+
