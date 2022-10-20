@@ -96,9 +96,9 @@ records &lt;- read.csv(&quot;all_teams.csv&quot;)</code></pre>
 <pre class="r"><code>terps &lt;- joined %&gt;% filter(team == &quot;Maryland&quot;)
 
 ggplot() + 
-  geom_point(data=joined, aes(x=total_wins, y=rating)) +
-  geom_smooth(data=joined, aes(x=total_wins, y=rating), method=&quot;lm&quot;) +
-  geom_point(data=terps, aes(x=total_wins, y=rating), color = &quot;red&quot;)</code></pre>
+  geom_point(data=joined, aes(x=rating, y=total_wins)) +
+  geom_smooth(data=joined, aes(x=rating, y=total_wins), method=&quot;lm&quot;) +
+  geom_point(data=terps, aes(x=rating, y=total_wins), color = &quot;red&quot;)</code></pre>
 <pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
 <p><img src="https://rinatorch.github.io/sportsdatablog/2022/10/20/recruiting-ratings-and-wins/index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>Let’s build a linear model to analyze.</p>
