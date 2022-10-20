@@ -111,7 +111,7 @@ progressr::with_progress({
   pbp &lt;- cfbfastR::load_cfb_pbp(seasons)
 })
 tictoc::toc()</code></pre>
-<pre><code>## 52.75 sec elapsed</code></pre>
+<pre><code>## 45.72 sec elapsed</code></pre>
 <p>Now we’re ready. First, let’s take a peek at Saturday’s game, where the Terps beat Indiana 38-33. Let’s see what role Connor Bazelak played in the contest.</p>
 <pre class="r"><code>sat_game &lt;- pbp %&gt;%
   filter(game_id == 401405114)%&gt;%
@@ -160,7 +160,7 @@ sat_game</code></pre>
 ## #   penalty_detail &lt;chr&gt;, yds_penalty &lt;dbl&gt;, penalty_1st_conv &lt;lgl&gt;,
 ## #   new_series &lt;dbl&gt;, firstD_by_kickoff &lt;dbl&gt;, firstD_by_poss &lt;dbl&gt;, …</code></pre>
 <pre class="r"><code>#You can see that Bazelak did it twice on Saturday, at the start of both halves. Let&#39;s see just how rare this is, with a focus on what goes on in the first half.</code></pre>
-<p>Out of a massive dataset of play-by-play data, we’re going to try to track down all of the first plays from scrimmage in the first half. First, we filter to the first half, then we filter to the first play after kickoff and then the first drive.</p>
+<p>Out of a massive dataset of play-by-play data, we’re going to try to track down all of the first plays from scrimmage in the first half. We want the first drive, the first thing after kickoff, and let’s get rid of penalties.</p>
 <pre class="r"><code>first_plays &lt;-pbp%&gt;%
   filter(firstD_by_poss == 1, lag_kickoff_play == 1, drive_number == 1, play_type != &#39;Penalty&#39;)</code></pre>
 <p>This returns 6,921 first plays across all games in the dataset.</p>
