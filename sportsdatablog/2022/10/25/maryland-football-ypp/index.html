@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.104.3" />
+
+
+<title>Maryland Football YPP - Sports Data Blog</title>
+<meta property="og:title" content="Maryland Football YPP - Sports Data Blog">
+
+
+  <link href='https://rinatorch.github.io/sportsdatablog/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/sportsdatablog/css/fonts.css" media="all">
+<link rel="stylesheet" href="/sportsdatablog/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/sportsdatablog/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/sportsdatablog/about/">About</a></li>
+    
+    <li><a href="https://github.com/rinatorch">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/rstudio">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">5 min read</span>
+    
+
+    <h1 class="article-title">Maryland Football YPP</h1>
+
+    
+    <span class="article-date">2022-10-25</span>
+    
+
+    <div class="article-content">
+      
+
+
+<p>Maryland football’s offense is more powerful than it was a decade ago, according to an analysis of years of NCAA data. The 2022-23 Maryland Football team is thriving in offensive yards per play, but isn’t as defensively powerful as past squads have been. So far this year, this season’s team has the highest win percentage compared to past seasons.</p>
+<p>The 2011-2012 squad only collected a few wins and is among the worst teams the football program has seen in the past ten years. Meanwhile, the 2021-22 Terps carried a strong offense, complemented by a significant effort on defense.</p>
+<p>The analysis included a broad NCAA dataset, filtered to the Terrapins and grouped by season.</p>
+<pre class="r"><code>#Load Libraries
+library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+## ✔ ggplot2 3.3.6      ✔ purrr   0.3.4 
+## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
+## ✔ tidyr   1.2.1      ✔ stringr 1.4.1 
+## ✔ readr   2.1.2      ✔ forcats 0.5.2 
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(ggplot2)
+library(ggrepel)
+
+#Pull in NCAA data
+logs &lt;- read_csv(&quot;https://dwillis.github.io/sports-data-files/footballlogs1122.csv&quot;)</code></pre>
+<pre><code>## Rows: 18050 Columns: 57
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr   (9): HomeAway, Opponent, Result, TeamFull, TeamURL, Outcome, Team, Con...
+## dbl  (47): Game, PassingCmp, PassingAtt, PassingPct, PassingYds, PassingTD, ...
+## date  (1): Date
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>#Filter to the Terps
+logs &lt;- logs %&gt;%
+  filter(TeamFull == &quot;Maryland Terrapins&quot;)
+
+#Prepare records of wins and losses for analysis
+winlosslogs &lt;- logs %&gt;% 
+  mutate(
+    wins = case_when(
+      grepl(&quot;W&quot;, Outcome) ~ 1, 
+      grepl(&quot;L&quot;, Outcome) ~ 0)
+)
+
+#Group by Season, to help us isolate the best squad
+winlosslogs %&gt;% 
+  group_by(Season) %&gt;% 
+  summarise(
+    TotalPlays = sum(OffensivePlays), 
+    TotalYards = sum(OffensiveYards), 
+    DefensivePlays = sum(DefPlays), 
+    DefensiveYards = sum(DefYards), 
+    TotalWins = sum(wins)) %&gt;%
+
+#Measure Offensive Yards Per Play and Defensive Yards Per Play   
+  mutate(
+    OffensiveYPP = TotalYards/TotalPlays, 
+    DefensiveYPP = DefensiveYards/DefensivePlays) -&gt; ypp</code></pre>
+<p>Here’s what that looks like visually.</p>
+<pre class="r"><code>#Visualize analysis
+ggplot() + 
+    geom_point(data=ypp, 
+    aes(x=OffensiveYPP, y=DefensiveYPP, size=TotalWins, label=Season), 
+    color=&quot;red&quot;, alpha=.5) + 
+  geom_vline(xintercept = 5.863151) + 
+  geom_hline(yintercept = 5.448228) +
+  geom_text_repel(
+    data=ypp, 
+    aes(x=OffensiveYPP, y=DefensiveYPP, label=Season))+
+  labs(title=&quot;When did Maryland Football have its strongest squad?&quot;, subtitle=&quot;The 2021-2022 was among historic top-performing Maryland Football teams.&quot;, caption=&quot;Note: The 2022-23 season is still in progress. Source: NCAA | By Rina Torchinsky&quot;)  + theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 8), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: label</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/10/25/maryland-football-ypp/index_files/figure-html/unnamed-chunk-2-1.png" width="672" />
+Using a bubble chart, we can see the 2022-23 Terps aren’t showing the same defensive output as former teams. The 2021-22 proved to be more effective in defensive plays. Of course, it should be noted that the 2022-23 season is still underway, so these figures aren’t giving us the full picture.</p>
+<p>As an aside:
+Here are some ways this could be done:
+–&gt; We could narrow to just the first six games of each season
+In pseudo code, I imagine this could include grouping by season and extracting only the six most recent dates – but this is something I struggled to execute.</p>
+<p>–&gt; We could also calculate a win-percentage
+In pseudo code, this could be total wins/(total wins + total losses)</p>
+<p>I took a stab at both of these and was able to get a picture of what the win percentage looked like. But my findings aren’t as pretty as the chart at the core of this analysis.</p>
+<pre class="r"><code>#Prepare records of wins and losses for analysis
+winlosslogs &lt;- logs %&gt;% 
+  mutate(
+   loss = case_when(
+      grepl(&quot;W&quot;, Outcome) ~ 0, 
+      grepl(&quot;L&quot;, Outcome) ~ 1)
+)
+
+losslogsdf &lt;- winlosslogs %&gt;% 
+  group_by(Season) %&gt;% 
+  summarise(
+        TotalLoss = sum(loss))
+
+losslogsdf</code></pre>
+<pre><code>## # A tibble: 12 × 2
+##    Season  TotalLoss
+##    &lt;chr&gt;       &lt;dbl&gt;
+##  1 2011-12        10
+##  2 2012-13         8
+##  3 2013-14         6
+##  4 2014-15         6
+##  5 2015-16         9
+##  6 2016-17         7
+##  7 2017-18         8
+##  8 2018-19         7
+##  9 2019-20         9
+## 10 2020-21         3
+## 11 2021-22         6
+## 12 2022-23         2</code></pre>
+<p>Here you can see that the Terps had the greatest number of losses in 2011-12. The Terps have seen the fewest losses in 2022-23, which also only includes some of the data. Although this data is not perfect, it’s clear that the Terps win count is increasing.</p>
+<pre class="r"><code>ggplot() + 
+  geom_bar(
+    data=losslogsdf, 
+    aes(x=Season, weight = `TotalLoss`)
+  )</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/10/25/maryland-football-ypp/index_files/figure-html/unnamed-chunk-4-1.png" width="672" />
+In this funky chart, you can see how the Terps’ loss count has declined over the years.</p>
+<p>We can also look at how the win count has changed.</p>
+<pre class="r"><code>#Prepare records of wins and losses for analysis
+winlosslogs &lt;- logs %&gt;% 
+  mutate(
+   win  = case_when(
+      grepl(&quot;W&quot;, Outcome) ~ 1, 
+      grepl(&quot;L&quot;, Outcome) ~ 0)
+)
+
+winlogsdf &lt;- winlosslogs %&gt;% 
+  group_by(Season) %&gt;% 
+  summarise(
+        TotalWin = sum(win))
+
+winlogsdf</code></pre>
+<pre><code>## # A tibble: 12 × 2
+##    Season  TotalWin
+##    &lt;chr&gt;      &lt;dbl&gt;
+##  1 2011-12        2
+##  2 2012-13        4
+##  3 2013-14        7
+##  4 2014-15        7
+##  5 2015-16        3
+##  6 2016-17        6
+##  7 2017-18        4
+##  8 2018-19        5
+##  9 2019-20        3
+## 10 2020-21        2
+## 11 2021-22        7
+## 12 2022-23        4</code></pre>
+<pre class="r"><code>#We can visualize it, too.
+ggplot() + 
+  geom_bar(
+    data=winlogsdf, 
+    aes(x=Season, weight = `TotalWin`)
+  )</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/10/25/maryland-football-ypp/index_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+The win count isn’t as clear cut as th loss count. Let’s analyze the win percentage instead.</p>
+<pre class="r"><code>df &lt;- inner_join(losslogsdf, winlogsdf, by=&quot;Season&quot;)
+
+df &lt;- df %&gt;%
+  mutate(TotalGames = TotalWin + TotalLoss)
+
+df &lt;- df %&gt;%
+  mutate(WinPct = TotalWin/TotalGames)%&gt;%
+  arrange(desc(WinPct))
+
+df</code></pre>
+<pre><code>## # A tibble: 12 × 5
+##    Season  TotalLoss TotalWin TotalGames WinPct
+##    &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;
+##  1 2022-23         2        4          6  0.667
+##  2 2013-14         6        7         13  0.538
+##  3 2014-15         6        7         13  0.538
+##  4 2021-22         6        7         13  0.538
+##  5 2016-17         7        6         13  0.462
+##  6 2018-19         7        5         12  0.417
+##  7 2020-21         3        2          5  0.4  
+##  8 2012-13         8        4         12  0.333
+##  9 2017-18         8        4         12  0.333
+## 10 2015-16         9        3         12  0.25 
+## 11 2019-20         9        3         12  0.25 
+## 12 2011-12        10        2         12  0.167</code></pre>
+<p>The proof: This year’s Terps have the highest win percentage on record.</p>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/sportsdatablog/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/sportsdatablog/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+
+    
+  </body>
+</html>
+
