@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.104.3" />
+
+
+<title>Volleybll Aces Beeswarm - Sports Data Blog</title>
+<meta property="og:title" content="Volleybll Aces Beeswarm - Sports Data Blog">
+
+
+  <link href='https://rinatorch.github.io/sportsdatablog/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/sportsdatablog/css/fonts.css" media="all">
+<link rel="stylesheet" href="/sportsdatablog/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/sportsdatablog/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/sportsdatablog/about/">About</a></li>
+    
+    <li><a href="https://github.com/rinatorch">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/rstudio">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">2 min read</span>
+    
+
+    <h1 class="article-title">Volleybll Aces Beeswarm</h1>
+
+    
+    <span class="article-date">2022-10-27</span>
+    
+
+    <div class="article-content">
+      
+
+
+<p>Maryland Volleyball setter Sydney Dowler leads the team in aces per match, earning nearly two per match, according to an anlaysis of NCAA data.</p>
+<p>Fellow setter Erin Engel lags behind the metric. Middle blocker Laila Ricks, meanwhile, earns more aces per match than many of the best in the NCAA who play the same position.</p>
+<p>The data spans NCAA women’s volleyball players who have played at least 20 matches and have recorded some of the top numbers in aces per set.</p>
+<pre class="r"><code>#Load libraries
+library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+## ✔ ggplot2 3.3.6      ✔ purrr   0.3.4 
+## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
+## ✔ tidyr   1.2.1      ✔ stringr 1.4.1 
+## ✔ readr   2.1.2      ✔ forcats 0.5.2 
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(ggbeeswarm)
+library(ggrepel)
+
+set.seed(1234)</code></pre>
+<p>Here’s the data fundamental to the analysis.</p>
+<pre class="r"><code>#Load data
+players &lt;- read.csv(&quot;https://raw.githubusercontent.com/dwillis/NCAAWomensVolleyballData/main/data/ncaa_womens_volleyball_playerstats_2022.csv&quot;)</code></pre>
+<p>Here, I begin to analyze the data and establish limitations.</p>
+<pre class="r"><code>#Filter to players who have played at least 20 matches
+activeplayers &lt;- players %&gt;% filter(mp&gt;20)
+
+#Filter out players with NAs in aces and position column
+activeplayers &lt;- activeplayers %&gt;%
+  filter(!is.na(aces)) %&gt;%
+  filter(!is.na(pos))
+
+#Calculate the number of aces per match
+activeplayers &lt;- activeplayers %&gt;%
+  mutate(aces_pm = aces/mp)
+
+
+#Identify the third quartile and above, and filter on it 
+summary(activeplayers$aces_pm)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##  0.0000  0.1818  0.6190  0.6119  0.9524  3.1200</code></pre>
+<pre class="r"><code>activeplayers_selects &lt;- activeplayers %&gt;%
+  filter(aces_pm &gt;  0.9524)</code></pre>
+<p>Here’s how I built the visualization</p>
+<pre class="r"><code>#Create basic beeswarm plot
+
+ggplot() + geom_beeswarm(data=activeplayers_selects, aes(x=pos, y=aces_pm), color=&quot;grey&quot;)</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/10/27/volleybll-aces-beeswarm/index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>#Filter to Maryland players
+
+umd &lt;- activeplayers_selects %&gt;% 
+  filter(team == &quot;Maryland Terrapins, Terps&quot;)
+
+#Visualize in-depth
+ggplot() + 
+  geom_jitter(
+    data=activeplayers_selects, 
+    groupOnX=TRUE, 
+    aes(x=pos, y=aces_pm), color=&quot;grey&quot;) + 
+  geom_jitter(
+    data=umd, 
+    groupOnX=TRUE, 
+    aes(x=pos, y=aces_pm), color=&quot;red&quot;) + 
+geom_text_repel(
+    data=umd, 
+    aes(x=pos, y=aces_pm, label=full_name)) +
+
+  #Give the chart title and description
+labs(title=&quot;Maryland Volleyball&#39;s Sydney Dowler leads the team in aces per match&quot;, subtitle=&quot;The setter produces nearly two aces per match. Meanwhile, fellow setter Erin Engel lags in the metric.&quot;, caption=&quot;Source: NCAA | By Rina Torchinsky&quot;)  + theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 8), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<pre><code>## Warning: Ignoring unknown parameters: groupOnX
+## Ignoring unknown parameters: groupOnX</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/10/27/volleybll-aces-beeswarm/index_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/sportsdatablog/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/sportsdatablog/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+
