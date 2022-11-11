@@ -6,7 +6,19 @@
     <description>Recent content in Posts on Sports Data Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 01 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://rinatorch.github.io/sportsdatablog/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 10 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://rinatorch.github.io/sportsdatablog/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Are College Teams Passing More on First Down?</title>
+      <link>https://rinatorch.github.io/sportsdatablog/2022/11/10/are-college-teams-passing-more-on-first-down/</link>
+      <pubDate>Thu, 10 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://rinatorch.github.io/sportsdatablog/2022/11/10/are-college-teams-passing-more-on-first-down/</guid>
+      <description>In this analysis, we’ll explore whether college teams are passing more on first down. We’ll begin by loading in college football data and then we’ll narrow it to first down plays. We’ll analyze passing plays, calculate a percentage and then we’ll visualize in search of insights.
+Let’s begin by loading libraries.
+library(tidyverse)library(cfbfastR)library(ggalt)Let’s load the data, too. Here’s college football data from 2014 to 2022.
+tictoc::tic()pbp &amp;lt;- data.</description>
+    </item>
+    
     <item>
       <title>NFL RedZone EPA Reverse Engineering</title>
       <link>https://rinatorch.github.io/sportsdatablog/2022/11/01/nfl-redzone-epa-reverse-engineering/</link>

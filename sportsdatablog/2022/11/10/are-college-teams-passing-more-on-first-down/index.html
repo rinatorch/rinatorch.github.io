@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.104.3" />
+
+
+<title>Are College Teams Passing More on First Down? - Sports Data Blog</title>
+<meta property="og:title" content="Are College Teams Passing More on First Down? - Sports Data Blog">
+
+
+  <link href='https://rinatorch.github.io/sportsdatablog/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/sportsdatablog/css/fonts.css" media="all">
+<link rel="stylesheet" href="/sportsdatablog/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/sportsdatablog/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/sportsdatablog/about/">About</a></li>
+    
+    <li><a href="https://github.com/rinatorch">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/rstudio">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">4 min read</span>
+    
+
+    <h1 class="article-title">Are College Teams Passing More on First Down?</h1>
+
+    
+    <span class="article-date">2022-11-10</span>
+    
+
+    <div class="article-content">
+      
+
+
+<p>In this analysis, we’ll explore whether college teams are passing more on first down. We’ll begin by loading in college football data and then we’ll narrow it to first down plays. We’ll analyze passing plays, calculate a percentage and then we’ll visualize in search of insights.</p>
+<p>Let’s begin by loading libraries.</p>
+<pre class="r"><code>library(tidyverse)
+library(cfbfastR)
+library(ggalt)</code></pre>
+<p>Let’s load the data, too. Here’s college football data from 2014 to 2022.</p>
+<pre class="r"><code>tictoc::tic()
+pbp &lt;- data.frame()
+seasons &lt;- 2014: cfbfastR:::most_recent_cfb_season()
+progressr::with_progress({
+
+  pbp &lt;- cfbfastR::load_cfb_pbp(seasons)
+})
+tictoc::toc()</code></pre>
+<pre><code>## 52.38 sec elapsed</code></pre>
+<p>First, let’s define passing plays. We’re following cfbfastR’s “pass” column, which is coded zero for non-passes and one for passes.</p>
+<p>But the “pass” column might not be perfect. Fumbles and sacks, among other plays, might be up for debate. The table below gives us insight into passes and non-passes. Here’s a short list of what’s considered a passing play in this analysis.</p>
+<ul>
+<li>Pass Reception<br />
+</li>
+<li>Pass Incompletion<br />
+</li>
+<li>Sack<br />
+</li>
+<li>Passing Touchdown<br />
+</li>
+<li>Fumble Recovery (Opponent)</li>
+<li>Fumble Recovery (Opponent) Touchdown<br />
+</li>
+<li>Interception Return<br />
+</li>
+<li>Fumble Recovery (Own)</li>
+<li>Interception Return Touchdown<br />
+</li>
+<li>Safety</li>
+<li>Pass Completion</li>
+<li>Pass</li>
+</ul>
+<pre class="r"><code>passes &lt;- pbp %&gt;%
+  select(play_type, pass)%&gt;%
+  distinct()%&gt;%
+  filter(!pass == 0)
+
+passes</code></pre>
+<pre><code>## # A tibble: 13 × 2
+##    play_type                             pass
+##    &lt;chr&gt;                                &lt;dbl&gt;
+##  1 Pass Reception                           1
+##  2 Pass Incompletion                        1
+##  3 Sack                                     1
+##  4 Passing Touchdown                        1
+##  5 Fumble Recovery (Opponent)               1
+##  6 Fumble Recovery (Opponent) Touchdown     1
+##  7 Interception Return                      1
+##  8 Fumble Recovery (Own)                    1
+##  9 Interception Return Touchdown            1
+## 10 Safety                                   1
+## 11 Pass Completion                          1
+## 12 &lt;NA&gt;                                     1
+## 13 Pass                                     1</code></pre>
+<p>Now, we can begin to break it down and zero in on passing plays. First, we’ll create a dataframe called first_downs. We’ll filter to the first down. Next, we’ll group by year and team. Then, we create a column for total plays and a column for passing plays. We’ll add up all of the ones to estimate the number of passes. Because each row is a play, we can count the number of rows to count up all plays.</p>
+<pre class="r"><code>first_downs &lt;- pbp %&gt;%
+  filter(down == 1)%&gt;%
+  group_by(year, pos_team)%&gt;%
+   summarise(
+    total_plays = n(),
+    pass_plays = sum(pass),
+    )%&gt;%
+  mutate(pass_pct = pass_plays/total_plays)</code></pre>
+<p>Let’s visualize it.</p>
+<pre class="r"><code>ggplot() + 
+  geom_line(data=first_downs, aes(x=year, y=pass_pct, group=pos_team))</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/11/10/are-college-teams-passing-more-on-first-down/index_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+Modern art.</p>
+<p>This graphic isn’t telling us much. It is obviously quite difficult to decipher. Let’s narrow to the Big Ten to see if that’s any better.</p>
+<pre class="r"><code>b10 &lt;- c(&quot;Michigan&quot;, &quot;Ohio State&quot;, &quot;Penn State&quot;, &quot;Maryland&quot;, &quot;Michigan State&quot;, &quot;Rutgers&quot;, &quot;Indiana&quot;, &quot;Illinois&quot;, &quot;Iowa&quot;, &quot;Purdue&quot;, &quot;Wisconsin&quot;, &quot;Minnesota&quot;, &quot;Nebraska&quot;, &quot;Northwestern&quot;)
+
+b10_first_downs &lt;- first_downs %&gt;%
+  filter(pos_team %in% b10)
+
+ggplot() + 
+  geom_line(data=b10_first_downs, aes(x=year, y=pass_pct, color=pos_team))</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/11/10/are-college-teams-passing-more-on-first-down/index_files/figure-html/unnamed-chunk-6-1.png" width="672" />
+This is still a lot to take in. If you squint, you can see Indiana dominating in its percentage of first down passing plays. Wisconsin looks to be the lowest. But all of these colors make this difficult to make out.</p>
+<p>Let’s try a series of small multiples. We can also add a line for the average passing percent across all years.</p>
+<pre class="r"><code>mean&lt;-mean(b10_first_downs$pass_pct)
+
+ggplot() + 
+  geom_hline(yintercept=mean, color=&quot;blue&quot;)+
+  geom_line(data=b10_first_downs, aes(x=year, y=pass_pct, group=pos_team)) + 
+  facet_wrap(~pos_team) +
+   labs(title=&quot;Passing plays dominate Indiana&#39;s first down plays this season&quot;, subtitle=&quot;Of all Big 10 teams, the Hoosiers hold the highest percentage of passing plays on first down.&quot;, caption=&quot;Source: cbfastR | By Rina Torchinsky&quot;, y=&quot;First Down Passing Play Percentage&quot;, x = &quot;Year&quot;) + 
+  scale_y_continuous(limits = c(0, .6))+
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 8), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/11/10/are-college-teams-passing-more-on-first-down/index_files/figure-html/unnamed-chunk-7-1.png" width="672" />
+Now, we’re talking. The small multiples are a lot more digestible.</p>
+<p>The small multiples are (appropriately) quite small, but this is better than the alternatives we’ve tried. While Indiana (1-5 in conference games) towers over others in the first down passing plays percentage metric, Maryland (3-3 in conference games) has the second highest proportion in 2022.</p>
+<p>Indiana ranks at the bottom of B10 East. The Hoosiers hold the same conference record as the Scarlet Knights, but Rutgers has the second lowest first down passing play percentage.</p>
+<p>The bulk of the teams aren’t far from the mean. Nebraska, Iowa and Minnesota each show small increases in passing play percentages on first down, but none of the values are too far from the average.</p>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/sportsdatablog/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/sportsdatablog/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+
