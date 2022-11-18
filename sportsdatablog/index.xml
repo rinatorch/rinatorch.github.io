@@ -6,7 +6,18 @@
     <description>Recent content on Sports Data Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 10 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://rinatorch.github.io/sportsdatablog/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 17 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://rinatorch.github.io/sportsdatablog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>What&#39;s in a Kevin Willard Team</title>
+      <link>https://rinatorch.github.io/sportsdatablog/2022/11/17/what-s-in-a-kevin-willard-team/</link>
+      <pubDate>Thu, 17 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://rinatorch.github.io/sportsdatablog/2022/11/17/what-s-in-a-kevin-willard-team/</guid>
+      <description>Maryland hired Kevin Willard, former Seton Hall coach, to the Terrapins men’s basketball program earlier this year. Willard joins the program after leading the Pirates for more than a decade. Through this analysis, we’ll identify what defines a Kevin Willard team and discuss what that might mean for Maryland.
+Let’s start by loading libraries and data.
+library(tidyverse)library(ggplot2)library(ggbeeswarm)library(gt)set.seed(1234)cbb &amp;lt;- read_csv(&amp;quot;https://dwillis.github.io/sports-data-files/logs1222.csv&amp;quot;)To begin, we’ll create a ton of average metrics by season and team.</description>
+    </item>
+    
     <item>
       <title>Are College Teams Passing More on First Down?</title>
       <link>https://rinatorch.github.io/sportsdatablog/2022/11/10/are-college-teams-passing-more-on-first-down/</link>

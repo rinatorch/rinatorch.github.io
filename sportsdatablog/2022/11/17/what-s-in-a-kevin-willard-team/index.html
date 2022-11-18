@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.104.3" />
+
+
+<title>What&#39;s in a Kevin Willard Team - Sports Data Blog</title>
+<meta property="og:title" content="What&#39;s in a Kevin Willard Team - Sports Data Blog">
+
+
+  <link href='https://rinatorch.github.io/sportsdatablog/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/sportsdatablog/css/fonts.css" media="all">
+<link rel="stylesheet" href="/sportsdatablog/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/sportsdatablog/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/sportsdatablog/about/">About</a></li>
+    
+    <li><a href="https://github.com/rinatorch">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/rstudio">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">11 min read</span>
+    
+
+    <h1 class="article-title">What&#39;s in a Kevin Willard Team</h1>
+
+    
+    <span class="article-date">2022-11-17</span>
+    
+
+    <div class="article-content">
+      
+
+
+<p>Maryland hired Kevin Willard, former Seton Hall coach, to the Terrapins men’s basketball program earlier this year. Willard joins the program after leading the Pirates for more than a decade. Through this analysis, we’ll identify what defines a Kevin Willard team and discuss what that might mean for Maryland.</p>
+<p>Let’s start by loading libraries and data.</p>
+<pre class="r"><code>library(tidyverse)
+library(ggplot2)
+library(ggbeeswarm)
+library(gt)
+set.seed(1234)</code></pre>
+<pre class="r"><code>cbb &lt;- read_csv(&quot;https://dwillis.github.io/sports-data-files/logs1222.csv&quot;)</code></pre>
+<p>To begin, we’ll create a ton of average metrics by season and team. This will allow us to identify changes in a team’s performance over time, and it helps zoom out from the game level. Here, we create fields for average team score, average opponent score, average margin of error, average rebounds per game, average turnovers per game, average personal fouls per game, average free throws per game, average three-point shots per game, average three-point shooting percentage, average shooting percentage, avergae steals per game, average blocks per game and average assists per game.</p>
+<p>We’ll also create separate dataframes for Maryland and Seton Hall. We can pull these into our analyses and visualization later.</p>
+<pre class="r"><code>cbb_groups &lt;- cbb %&gt;%
+  group_by(Season, TeamFull)%&gt;%
+  summarise(
+    avg_game_score = mean(TeamScore),
+    avg_opp_score = mean(OpponentScore),
+    avg_margin = (avg_game_score - avg_opp_score),
+    avg_rebounds = mean(TeamTotalRebounds),
+    avg_turnovers = mean(TeamTurnovers),
+    avg_personal_fouls = mean(TeamPersonalFouls),
+    avg_free_throws = mean(TeamFT),
+    avg_threes = mean(Team3P),
+    avg_3pct = mean(Team3PPCT),
+    avg_fgpct = mean(TeamFGPCT),
+    avg_steals = mean(TeamSteals),
+    avg_blocks = mean(TeamBlocks),
+    avg_assists = mean(TeamAssists)
+
+  )
+
+#filter to seton hall
+cbb_sh &lt;- cbb_groups %&gt;%
+  filter(TeamFull == &quot;Seton Hall Pirates&quot;)
+
+
+#filter to md
+cbb_md &lt;- cbb_groups %&gt;%
+  filter(TeamFull == &quot;Maryland Terrapins&quot;)</code></pre>
+<p>Next, we’ll construct an alternate selection. Here, we build a dataframe that filters to just the Big East conference. This will help us understand how Seton Hall stacked up against conference opponents. We’ll also create a dataframe for averages by year across the entire Big East. This could be a helpful benchmark later.</p>
+<pre class="r"><code>cbb_bigeast &lt;- cbb %&gt;%
+  filter(Conference == &quot;Big East&quot;)%&gt;%
+  group_by(Season, TeamFull)%&gt;%
+  summarise(
+    avg_game_score = mean(TeamScore),
+    avg_opp_score = mean(OpponentScore),
+    avg_margin = (avg_game_score - avg_opp_score),
+    avg_rebounds = mean(TeamTotalRebounds),
+    avg_turnovers = mean(TeamTurnovers),
+    avg_personal_fouls = mean(TeamPersonalFouls),
+    avg_free_throws = mean(TeamFT),
+    avg_threes = mean(Team3P),
+    avg_3pct = mean(Team3PPCT),
+    avg_fgpct = mean(TeamFGPCT),
+     avg_fgpct = mean(TeamFGPCT),
+    avg_steals = mean(TeamSteals),
+    avg_blocks = mean(TeamBlocks),
+    avg_assists = mean(TeamAssists)
+
+  )
+
+cbb_bigeast_avgs &lt;- cbb_bigeast%&gt;%
+  group_by(Season)%&gt;%
+   summarise(
+    avg_rebounds = mean(avg_rebounds),
+    avg_turnovers = mean(avg_turnovers),
+    avg_personal_fouls = mean(avg_personal_fouls),
+    avg_free_throws = mean(avg_free_throws),
+    avg_threes = mean(avg_threes),
+    avg_3pct = mean(avg_3pct),
+    avg_fgpct = mean(avg_fgpct),
+    avg_steals = mean(avg_steals),
+    avg_blocks = mean(avg_blocks),
+    avg_assists = mean(avg_assists)
+
+  )</code></pre>
+<p>At last, it’s time to visualize. I spent a lot of time inspecting beeswarm plots that depicted how teams stacked up on a slew of stats. We’re going to dive into some of the highlights, and when relevant, we’ll take a look at what this meant for Seton Hall on the conference level.</p>
+<p>First, let’s inspect how Seton Hall’s rebounds per game compares with the rest of the NCAA.</p>
+<pre class="r"><code>ggplot() + 
+  geom_beeswarm(
+    data=cbb_groups, 
+    groupOnX=TRUE, 
+    aes(x=Season, y=avg_rebounds), color=&quot;grey&quot;) + 
+  geom_beeswarm(
+    data=cbb_sh, 
+    groupOnX=TRUE, 
+    aes(x=Season, y=avg_rebounds), color=&quot;#004488&quot;)+
+  labs(title=&quot;Kevin Willard teams are powerful rebounding teams&quot;, subtitle=&quot;Of all NCAA teams, Seton Hall delivers some of the most rebounds per game, on average.&quot;, caption=&quot;Source: NCAA | By Rina Torchinsky&quot;, y = &quot;Average Rebounds Per Game&quot;)  + theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 10), 
+    axis.text = element_text(size = 7),
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<pre><code>## Warning: Removed 17 rows containing missing values (position_beeswarm).</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/11/17/what-s-in-a-kevin-willard-team/index_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+The Pirates are dominant when it comes to rebounds. This could tell us that Kevin Willard teams are powerful defenders. Let’s zoom in on the Big East.</p>
+<pre class="r"><code>ggplot() + 
+  geom_line(data=cbb_bigeast, aes(x=Season, y=avg_rebounds, group=TeamFull), color=&quot;gray&quot;) + 
+  geom_line(data=cbb_sh, aes(x=Season, y=avg_rebounds), color=&quot;#004488&quot;, group =1, size=1) +
+  geom_point(data=cbb_sh, aes(x=Season, y=avg_rebounds), color=&quot;#004488&quot;, group =1) +
+    labs(title=&quot;Seton Hall rebounds more than many Big East counterparts&quot;, subtitle=&quot;Last season, the Pirates averaged about 36 rebounds per game, which was the second highest in the Big East.&quot;, caption=&quot;Source: NCAA | By Rina Torchinsky&quot;, y = &quot;Average Rebounds Per Game&quot;) + theme_minimal()+
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 10), 
+    axis.text = element_text(size = 7),
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/11/17/what-s-in-a-kevin-willard-team/index_files/figure-html/unnamed-chunk-6-1.png" width="672" />
+Seton Hall had the second highest rebounds per game in the 2021-2022 season. It’s clear the team is at the top of the conference in rebounding. It’s also not something new for the Pirates. The Pirates are some of the top rebounders on a yearly basis. They dominated in 2015-2016 when they had about 37 rebounds per game.</p>
+<p>We’re beginning to establish a strong defending team, so let’s look into some other related stats. Enter blocks.</p>
+<pre class="r"><code>#big on blocks
+ggplot() + 
+  geom_beeswarm(
+    data=cbb_groups, 
+    groupOnX=TRUE, 
+    aes(x=Season, y=avg_blocks), color=&quot;grey&quot;) + 
+  geom_beeswarm(
+    data=cbb_sh, 
+    groupOnX=TRUE, 
+    aes(x=Season, y=avg_blocks), color=&quot;#004488&quot;)+
+  labs(title=&quot;Kevin Willard teams are dominant blockers&quot;, subtitle=&quot;Of all NCAA teams, Seton Hall executes some of the most blocks per game, on average.&quot;, caption=&quot;Source: NCAA | By Rina Torchinsky&quot;, y = &quot;Average Blocks Per Game&quot;)  + theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 10), 
+    axis.text = element_text(size = 7),
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<pre><code>## Warning: Removed 17 rows containing missing values (position_beeswarm).</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/11/17/what-s-in-a-kevin-willard-team/index_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>In the past three years, the Pirates have been top blockers. It also looks like something could be happening in waves. Watch how blocks per game increases from 2012-2013 into 2015-2016. Observe how blocks per game tanks, and then increases from 2016-2017 to 2021-2022. We’ll have to see if the Maryland Kevin Willard team follows this trajectory.</p>
+<p>Now, let’s see where The Pirates blocking got them in the Big East conference.</p>
+<pre class="r"><code>ggplot() + 
+  geom_line(data=cbb_bigeast, aes(x=Season, y=avg_blocks, group=TeamFull), color=&quot;gray&quot;) + 
+  geom_line(data=cbb_sh, aes(x=Season, y=avg_blocks), color=&quot;#004488&quot;, group =1, size=1) +
+  geom_point(data=cbb_sh, aes(x=Season, y=avg_blocks), color=&quot;#004488&quot;, group =1) +
+    labs(title=&quot;Seton Hall blocks more than many Big East counterparts&quot;, subtitle=&quot;Last season, the Pirates averaged about 5 blocks per game, which was the third highest in the Big East.&quot;, caption=&quot;Source: NCAA | By Rina Torchinsky&quot;, y = &quot;Average Blocks Per Game&quot;) + theme_minimal()+
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 10), 
+    axis.text = element_text(size = 7),
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/11/17/what-s-in-a-kevin-willard-team/index_files/figure-html/unnamed-chunk-8-1.png" width="672" />
+Seton Hall is a top-blocker in the Big East Conference. Last season, the Pirates had the third highest blocks per game, which continue to paint a picture of a defensively aggressive team. Note Seton Hall’s blocking dominance in the 2019-2020 season in the Big East.</p>
+<p>Let’s see if the defensive power holds true with steals.</p>
+<pre class="r"><code>ggplot() + 
+  geom_beeswarm(
+    data=cbb_groups, 
+    groupOnX=TRUE, 
+    aes(x=Season, y= avg_steals), color=&quot;grey&quot;) + 
+  geom_beeswarm(
+    data=cbb_sh, 
+    groupOnX=TRUE, 
+    aes(x=Season, y= avg_steals), color=&quot;#004488&quot;)+
+   labs(title=&quot;Seton Hall average steals per game fall in the middle of the NCAA&quot;, subtitle=&quot;The Pirates are slightly above average in steals per game, on average.&quot;, caption=&quot;Source: NCAA | By Rina Torchinsky&quot;, y = &quot;Average Steals Per Game&quot;)  + theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 10), 
+    axis.text = element_text(size = 7),
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<pre><code>## Warning: Removed 17 rows containing missing values (position_beeswarm).</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/11/17/what-s-in-a-kevin-willard-team/index_files/figure-html/unnamed-chunk-9-1.png" width="672" />
+This is pretty average. It’s certainly not as impressive, especially when we’re thinking about rebounds and blocks. The same held true in the league. The Pirates landed in the No. 5 spot, out of 11 teams, in steals last season. Here’s a rankings table. But an interesting sign the Pirates are lagging on steals but dominating in rebounds and blocks.</p>
+<pre class="r"><code>steals_table &lt;- cbb_bigeast %&gt;%
+  filter(Season == &quot;2021-2022&quot;)%&gt;%
+  select(Season, TeamFull, avg_steals)%&gt;%
+  arrange(desc(avg_steals))
+
+steals_table %&gt;% 
+  gt() %&gt;%
+cols_label(
+    TeamFull = &quot;Team&quot;,
+    avg_steals = &quot;Average Steals Per Game&quot;)%&gt;%
+tab_header(
+    title = &quot;Seton Hall Steals Aren&#39;t Groundbreaking&quot;,
+subtitle = &quot;In the Big East, the Pirates come out in the middle of the pack in steals per game last season.&quot;
+)</code></pre>
+<div id="pzveloiefp" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#pzveloiefp .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#pzveloiefp .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#pzveloiefp .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#pzveloiefp .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#pzveloiefp .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#pzveloiefp .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#pzveloiefp .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#pzveloiefp .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#pzveloiefp .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#pzveloiefp .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#pzveloiefp .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#pzveloiefp .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#pzveloiefp .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#pzveloiefp .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#pzveloiefp .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#pzveloiefp .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#pzveloiefp .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#pzveloiefp .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#pzveloiefp .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#pzveloiefp .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#pzveloiefp .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#pzveloiefp .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#pzveloiefp .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#pzveloiefp .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#pzveloiefp .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#pzveloiefp .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#pzveloiefp .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#pzveloiefp .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#pzveloiefp .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#pzveloiefp .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#pzveloiefp .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#pzveloiefp .gt_left {
+  text-align: left;
+}
+
+#pzveloiefp .gt_center {
+  text-align: center;
+}
+
+#pzveloiefp .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#pzveloiefp .gt_font_normal {
+  font-weight: normal;
+}
+
+#pzveloiefp .gt_font_bold {
+  font-weight: bold;
+}
+
+#pzveloiefp .gt_font_italic {
+  font-style: italic;
+}
+
+#pzveloiefp .gt_super {
+  font-size: 65%;
+}
+
+#pzveloiefp .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 75%;
+  vertical-align: 0.4em;
+}
+
+#pzveloiefp .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#pzveloiefp .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#pzveloiefp .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#pzveloiefp .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#pzveloiefp .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#pzveloiefp .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table">
+  <thead class="gt_header">
+    <tr>
+      <td colspan="2" class="gt_heading gt_title gt_font_normal" style>Seton Hall Steals Aren't Groundbreaking</td>
+    </tr>
+    <tr>
+      <td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style>In the Big East, the Pirates come out in the middle of the pack in steals per game last season.</td>
+    </tr>
+  </thead>
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col">Team</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col">Average Steals Per Game</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr class="gt_group_heading_row">
+      <td colspan="2" class="gt_group_heading">2021-2022</td>
+    </tr>
+    <tr class="gt_row_group_first"><td class="gt_row gt_left">St. John's (NY) Red Storm</td>
+<td class="gt_row gt_right">8.843750</td></tr>
+    <tr><td class="gt_row gt_left">Marquette Golden Eagles</td>
+<td class="gt_row gt_right">7.781250</td></tr>
+    <tr><td class="gt_row gt_left">Xavier Musketeers</td>
+<td class="gt_row gt_right">7.472222</td></tr>
+    <tr><td class="gt_row gt_left">Georgetown Hoyas</td>
+<td class="gt_row gt_right">7.161290</td></tr>
+    <tr><td class="gt_row gt_left">Seton Hall Pirates</td>
+<td class="gt_row gt_right">7.062500</td></tr>
+    <tr><td class="gt_row gt_left">DePaul Blue Demons</td>
+<td class="gt_row gt_right">6.225806</td></tr>
+    <tr><td class="gt_row gt_left">Villanova Wildcats</td>
+<td class="gt_row gt_right">6.026316</td></tr>
+    <tr><td class="gt_row gt_left">UConn Huskies</td>
+<td class="gt_row gt_right">5.939394</td></tr>
+    <tr><td class="gt_row gt_left">Creighton Bluejays</td>
+<td class="gt_row gt_right">5.485714</td></tr>
+    <tr><td class="gt_row gt_left">Butler Bulldogs</td>
+<td class="gt_row gt_right">5.181818</td></tr>
+    <tr><td class="gt_row gt_left">Providence Friars</td>
+<td class="gt_row gt_right">5.030303</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+<p>We’ve established a powerful defense in rebounds and blocks, with some left to be desired when it comes to steals. Let’s take a look at how Seton Hall fairs on offense.</p>
+<p>Here’s a gander at shooting percentage.</p>
+<pre class="r"><code>ggplot() + 
+  geom_beeswarm(
+    data=cbb_groups, 
+    groupOnX=TRUE, 
+    aes(x=Season, y= avg_fgpct), color=&quot;grey&quot;) + 
+  geom_beeswarm(
+    data=cbb_sh, 
+    groupOnX=TRUE, 
+    aes(x=Season, y= avg_fgpct), color=&quot;#004488&quot;)+
+  
+   labs(title=&quot;Seton Hall misses a lot of shots&quot;, subtitle=&quot;The Pirates are towards the bottom of the pack when it comes to shooting.&quot;, caption=&quot;Source: NCAA | By Rina Torchinsky&quot;, y = &quot;Shooting Percentage&quot;)  + theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 10), 
+    axis.text = element_text(size = 7),
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<pre><code>## Warning: Removed 17 rows containing missing values (position_beeswarm).</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/11/17/what-s-in-a-kevin-willard-team/index_files/figure-html/unnamed-chunk-11-1.png" width="672" />
+Oof. After seeing the Pirates dominate in some metrics, this figure isn’t impressive. It also looks like they’ve gotten worse over time. Let’s check out what that looks like in the Big East.</p>
+<pre class="r"><code>ggplot() + 
+  geom_line(data=cbb_bigeast, aes(x=Season, y=avg_fgpct, group=TeamFull), color=&quot;gray&quot;) + 
+  geom_line(data=cbb_sh, aes(x=Season, y=avg_fgpct), color=&quot;#004488&quot;, group =1, size=1) +
+  geom_point(data=cbb_sh, aes(x=Season, y=avg_fgpct), color=&quot;#004488&quot;, group =1) +
+    labs(title=&quot;Seton Hall&#39;s shooting percentage lags in the Big East&quot;, subtitle=&quot;Last season, the Pirates were shooting at about 42%, the third lowest in the conference.&quot;, caption=&quot;Source: NCAA | By Rina Torchinsky&quot;, y = &quot;Shooting Percentage&quot;) + theme_minimal()+
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 10), 
+    axis.text = element_text(size = 7),
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/11/17/what-s-in-a-kevin-willard-team/index_files/figure-html/unnamed-chunk-12-1.png" width="672" />
+Shooting percentage is definitely not a bright spot for Seton Hall. They’re not just toward the bottom of the NCAA, they’re in the bottom of their conference, too. Kevin Willard teams don’t seem to be stupendous shooting teams.</p>
+<p>Let’s peek at another offensive stat: Assists.</p>
+<pre class="r"><code>ggplot() + 
+  geom_beeswarm(
+    data=cbb_groups, 
+    groupOnX=TRUE, 
+    aes(x=Season, y= avg_assists), color=&quot;grey&quot;) + 
+  geom_beeswarm(
+    data=cbb_sh, 
+    groupOnX=TRUE, 
+    aes(x=Season, y= avg_assists), color=&quot;#004488&quot;)+
+  
+   labs(title=&quot;Seton Hall lags in assists&quot;, subtitle=&quot;The Pirates are in the bottom of the pack when it comes to assists&quot;, caption=&quot;Source: NCAA | By Rina Torchinsky&quot;, y = &quot;Average Assists Per Game&quot;)  + theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 10), 
+    axis.text = element_text(size = 7),
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<pre><code>## Warning: Removed 17 rows containing missing values (position_beeswarm).</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/11/17/what-s-in-a-kevin-willard-team/index_files/figure-html/unnamed-chunk-13-1.png" width="672" />
+The assists leave much to be desired. Last season, the Pirate saw the lowest average assists per game in at least a decade. Maybe it was a one-off. Past years were closer to average, and even above it in some cases. But the lack of assists could indicate a lack of team chemistry, which could be a bit worrisome especially as Willard is a new face at Maryland.</p>
+<p>Before we wrap up, let’s get a sense of how Maryland stacks up with Seton Hall. We know the Pirates were powerful rebounders and blockers. Let’s compare to the Terps.</p>
+<pre class="r"><code>ggplot() + 
+  geom_beeswarm(
+    data=cbb_groups, 
+    groupOnX=TRUE, 
+    aes(x=Season, y=avg_blocks), color=&quot;grey&quot;) + 
+  geom_beeswarm(
+    data=cbb_sh, 
+    groupOnX=TRUE, 
+    aes(x=Season, y=avg_blocks), color=&quot;#004488&quot;)+
+  geom_beeswarm(
+    data=cbb_md, 
+    groupOnX=TRUE, 
+    aes(x=Season, y=avg_blocks), color=&quot;#E03A3E&quot;) +
+  labs(title=&quot;Seton Hall blocks more than Maryland&quot;, caption=&quot;Source: NCAA | By Rina Torchinsky&quot;, y = &quot;Average Blocks Per Game&quot;)  + theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 10), 
+    axis.text = element_text(size = 7),
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<pre><code>## Warning: Removed 17 rows containing missing values (position_beeswarm).</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/11/17/what-s-in-a-kevin-willard-team/index_files/figure-html/unnamed-chunk-14-1.png" width="672" />
+Over the past three years, Seton Hall has more average blocks per game than the Terps. Last season, that was a by a pretty wide margin. It will be interesting to see if we see more blocks for the Terps this season.</p>
+<pre class="r"><code>ggplot() + 
+  geom_beeswarm(
+    data=cbb_groups, 
+    groupOnX=TRUE, 
+    aes(x=Season, y=avg_rebounds), color=&quot;grey&quot;) + 
+  geom_beeswarm(
+    data=cbb_sh, 
+    groupOnX=TRUE, 
+    aes(x=Season, y=avg_rebounds), color=&quot;#004488&quot;)+
+   geom_beeswarm(
+    data=cbb_md, 
+    groupOnX=TRUE, 
+    aes(x=Season, y=avg_rebounds), color=&quot;#E03A3E&quot;) +
+  labs(title=&quot;The Pirates rebounded more than the Terps over the past two seasons&quot;,caption=&quot;Source: NCAA | By Rina Torchinsky&quot;, y = &quot;Average Rebounds Per Game&quot;)  + theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 12, face = &quot;bold&quot;),
+    axis.title = element_text(size = 10), 
+    axis.text = element_text(size = 7),
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<pre><code>## Warning: Removed 17 rows containing missing values (position_beeswarm).</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/11/17/what-s-in-a-kevin-willard-team/index_files/figure-html/unnamed-chunk-15-1.png" width="672" />
+Over the past two years, Seton Hall rebounded more than the Terps. This is another thing to keep tabs on. Maybe we’ll see more rebounds from the Terps this season.</p>
+<p>Finally, let’s look at shooting percentage.</p>
+<pre class="r"><code>ggplot() + 
+  geom_beeswarm(
+    data=cbb_groups, 
+    groupOnX=TRUE, 
+    aes(x=Season, y= avg_fgpct), color=&quot;grey&quot;) + 
+  geom_beeswarm(
+    data=cbb_sh, 
+    groupOnX=TRUE, 
+    aes(x=Season, y= avg_fgpct), color=&quot;#004488&quot;)+
+   geom_beeswarm(
+    data=cbb_md, 
+    groupOnX=TRUE, 
+    aes(x=Season, y=avg_fgpct), color=&quot;#E03A3E&quot;) +
+   labs(title=&quot;Seton Hall misses a lot of shots&quot;, subtitle=&quot;The Pirates are towards the bottom of the pack when it comes to shooting.&quot;, caption=&quot;Source: NCAA | By Rina Torchinsky&quot;, y = &quot;Shooting Percentage&quot;)  + theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 10), 
+    axis.text = element_text(size = 7),
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<pre><code>## Warning: Removed 17 rows containing missing values (position_beeswarm).</code></pre>
+<p><img src="https://rinatorch.github.io/sportsdatablog/2022/11/17/what-s-in-a-kevin-willard-team/index_files/figure-html/unnamed-chunk-16-1.png" width="672" />
+This could be a bright spot for the Terps as it enters its Kevin Willard team era.The Terps shot better than Seton Hall in the past two seasons. Across all 11 seasons graphed, the Terps shot better in 8 of them.</p>
+<p>The bottom line: The Maryland Kevin Willard team could be a powerful one. If we see a typical Kevin Willard team - strong rebounds and blocks - mixed with the Terps’ shooting percentage, we could see a team with a dominant offense but also a promising offense. This could make the Terps a powerhouse this season, especially if the Maryland iteration of a Kevin Willard team comes with more assists, and maybe more steals.</p>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/sportsdatablog/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/sportsdatablog/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+
+    
+  </body>
+</html>
+
