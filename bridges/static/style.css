@@ -24,6 +24,7 @@ h1 {
 
 table {
     border-collapse:collapse;
+    font-family: Arial, sans-serif;
     margin: 0 0 20px 0;
     border-width: 0;
     width: 100%;
@@ -35,18 +36,9 @@ th {
 tr, td, th {
     border-color: #f2f2f2;
 }
-tr:hover {
-    background-color: #f3f3f3;
-}
+
 p {
     line-height:140%;
-}
-a {
-    color: #4591B8;
-    text-decoration: none;
-}
-a:hover {
-    text-decoration: underline;
 }
 
 }
