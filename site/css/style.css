@@ -33,13 +33,14 @@ a {
     font-family: 'Oswald', sans-serif;
 
 }
-
+/*
 .hed a {
 
-    font-family: 'Oswald', sans-serif;
-    font-size: larger;
+    font-family: 'Oswald', sans-serif
+    /*font-size: larger;**/
 
-}
+
+
 
 hr {
     width: 30%;
